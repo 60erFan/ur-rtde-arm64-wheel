@@ -1,0 +1,48 @@
+name: Build ur_rtde for Raspberry Pi
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-wheel:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Install Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            libboost-all-dev \
+            python3-dev
+
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Build ARM64 wheel
+        run: |
+          mkdir -p wheelhouse
+
+          CMAKE_BUILD_PARALLEL_LEVEL=$(nproc) \
+          python -m pip wheel \
+            --verbose \
+            --no-deps \
+            --no-binary=ur-rtde \
+            --wheel-dir wheelhouse \
+            ur_rtde==1.6.3
+
+          ls -lh wheelhouse
+
+      - name: Upload finished wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: ur-rtde-python313-linux-arm64
+          path: wheelhouse/*.whl
+          if-no-files-found: error
+          retention-days: 7
