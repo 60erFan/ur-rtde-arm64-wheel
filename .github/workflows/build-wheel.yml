@@ -35,7 +35,7 @@ jobs:
             --no-deps \
             --no-binary=ur-rtde \
             --wheel-dir wheelhouse \
-            ur_rtde==1.6.3
+            ur_rtde==1.6.5
 
           ls -lh wheelhouse
 
